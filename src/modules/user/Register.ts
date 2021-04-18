@@ -1,19 +1,13 @@
 // graphql schema
 
-import {
-  Arg,
-  Ctx,
-  Mutation,
-  Query,
-  Resolver,
-  UseMiddleware,
-} from "type-graphql";
+import { Arg, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 import { User } from "../../entitiy/User";
 import { RegisterInput } from "./register/RegisterInput";
 import argon from "argon2";
-import { MyContext } from "src/types/MyContext";
 import { isAuth } from "../middleware/isAuth";
 import { logger } from "../middleware/logger";
+import { sendEmail } from "../utils/sendEmail";
+import { createConfirmationUrl } from "../utils/createConfirmationUrl";
 
 @Resolver()
 export class RegisterResolver {
@@ -25,8 +19,7 @@ export class RegisterResolver {
 
   @Mutation(() => User)
   async register(
-    @Arg("data") { email, firstName, lastName, password }: RegisterInput,
-    @Ctx() ctx: MyContext
+    @Arg("data") { email, firstName, lastName, password }: RegisterInput
   ): Promise<User> {
     const hashedPassword = await argon.hash(password);
 
@@ -37,7 +30,9 @@ export class RegisterResolver {
       password: hashedPassword,
     }).save();
 
-    ctx.req.session!.userId = user.id;
+    await sendEmail(email, await createConfirmationUrl(user.id));
+
+    // ctx.req.session!.userId = user.id;
 
     return user;
   }

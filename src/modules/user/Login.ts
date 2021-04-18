@@ -13,13 +13,20 @@ export class LoginResolver {
   ): Promise<User | null> {
     const user = await User.findOne({ where: { email } });
 
+    // if user dosen't exists on db return null
     if (!user) {
       return null;
     }
 
+    // compare between hashed original password and hahsed input password
     const valid = await argon.verify(user.password, password);
 
     if (!valid) {
+      return null;
+    }
+
+    // if user dosen't confirmed email return null
+    if (!user.confirmed) {
       return null;
     }
 
