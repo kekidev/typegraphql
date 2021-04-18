@@ -23,6 +23,7 @@ export class RegisterResolver {
   ): Promise<User> {
     const hashedPassword = await argon.hash(password);
 
+    // create user
     const user = await User.create({
       firstName,
       lastName,
@@ -30,6 +31,7 @@ export class RegisterResolver {
       password: hashedPassword,
     }).save();
 
+    // send confirm email
     await sendEmail(email, await createConfirmationUrl(user.id));
 
     // ctx.req.session!.userId = user.id;

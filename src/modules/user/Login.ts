@@ -30,6 +30,7 @@ export class LoginResolver {
       return null;
     }
 
+    // set cookie
     ctx.req.session!.userId = user.id;
 
     return user;

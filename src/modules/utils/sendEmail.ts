@@ -14,10 +14,10 @@ export async function sendEmail(email: string, url: string) {
   });
 
   const info = await transporter.sendMail({
-    from: '"Fred Foo 👻" <foo@example.com>',
+    from: "john doe",
     to: email,
     subject: "Hello ✔",
-    text: "Hello world?",
+    text: "hey there ",
     html: `<a href="${url}">${url}</a>`,
   });
 
